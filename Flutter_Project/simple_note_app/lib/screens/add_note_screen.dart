@@ -3,7 +3,6 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../models/note_model.dart';
 import '../services/storage_service.dart';
-import '../widgets/drawing_board_screen.dart';
 
 class AddNotePage extends StatefulWidget {
   final Note? noteToEdit;
@@ -24,7 +23,6 @@ class _AddNotePageState extends State<AddNotePage>
   final ImagePicker _imagePicker = ImagePicker();
   late List<String> _imageFiles = [];
   late List<String> _attachmentFiles = [];
-  late List<String> _drawingFiles = [];
 
   @override
   void initState() {
@@ -51,7 +49,6 @@ class _AddNotePageState extends State<AddNotePage>
     // Khởi tạo file lists
     _imageFiles = List.from(widget.noteToEdit?.imageFiles ?? []);
     _attachmentFiles = List.from(widget.noteToEdit?.attachmentFiles ?? []);
-    _drawingFiles = List.from(widget.noteToEdit?.drawingFiles ?? []);
 
     // Bắt đầu animation
     _animationController.forward();
@@ -86,7 +83,6 @@ class _AddNotePageState extends State<AddNotePage>
       updatedAt: now,
       imageFiles: _imageFiles,
       attachmentFiles: _attachmentFiles,
-      drawingFiles: _drawingFiles,
     );
 
     Navigator.pop(context, note);
@@ -151,28 +147,6 @@ class _AddNotePageState extends State<AddNotePage>
     }
   }
 
-  /// Mở bảng vẽ tay
-  void _openDrawingBoard() async {
-    final result = await Navigator.push<dynamic>(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const DrawingBoardScreen(title: '✏️ Vẽ Tay'),
-      ),
-    );
-
-    if (result != null) {
-      try {
-        final savedPath = await StorageService().saveDrawing(result);
-        setState(() {
-          _drawingFiles.add(savedPath);
-        });
-        _showSnackBar('✅ Bản vẽ đã được lưu');
-      } catch (e) {
-        _showSnackBar('❌ Lỗi lưu bản vẽ: $e');
-      }
-    }
-  }
-
   /// Xóa ảnh
   void _removeImage(int index) {
     setState(() {
@@ -187,14 +161,6 @@ class _AddNotePageState extends State<AddNotePage>
       _attachmentFiles.removeAt(index);
     });
     _showSnackBar('🗑️ File đã xóa');
-  }
-
-  /// Xóa bản vẽ
-  void _removeDrawing(int index) {
-    setState(() {
-      _drawingFiles.removeAt(index);
-    });
-    _showSnackBar('🗑️ Bản vẽ đã xóa');
   }
 
   /// Hiển thị thông báo
@@ -322,7 +288,7 @@ class _AddNotePageState extends State<AddNotePage>
                 ),
                 const SizedBox(height: 16),
 
-                // Thanh công cụ thêm file/ảnh/vẽ tay
+                // Thanh công cụ thêm file/ảnh
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   decoration: BoxDecoration(
@@ -354,13 +320,6 @@ class _AddNotePageState extends State<AddNotePage>
                           label: 'File',
                           onPressed: _pickFile,
                           color: Colors.purple,
-                        ),
-                        // Nút vẽ tay
-                        _buildActionButton(
-                          icon: Icons.edit,
-                          label: 'Vẽ',
-                          onPressed: _openDrawingBoard,
-                          color: Colors.red,
                         ),
                         const SizedBox(width: 8),
                       ],
@@ -419,36 +378,6 @@ class _AddNotePageState extends State<AddNotePage>
                               return _buildFileItem(
                                 file: _attachmentFiles[index],
                                 onRemove: () => _removeAttachment(index),
-                              );
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                // Hiển thị bản vẽ
-                if (_drawingFiles.isNotEmpty)
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '✏️ Bản vẽ (${_drawingFiles.length})',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                          ),
-                        ),
-                        Expanded(
-                          child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: _drawingFiles.length,
-                            itemBuilder: (context, index) {
-                              return _buildFilePreview(
-                                file: _drawingFiles[index],
-                                onRemove: () => _removeDrawing(index),
-                                isImage: true,
                               );
                             },
                           ),

@@ -7,10 +7,8 @@
   - Ghi chú và các file liên quan sẽ được đặt trong `notes/`.
   - Ảnh: `notes/images/`
   - File đính kèm: `notes/attachments/`
-  - Bản vẽ tay: `notes/drawings/`
-
 - **iOS**: `Library/Application Support/` của ứng dụng.
-  - Cấu trúc tương tự: `notes/`, `notes/images/`, `notes/attachments/`, `notes/drawings/`.
+  - Cấu trúc tương tự: `notes/`, `notes/images/`, `notes/attachments/`.
 
 - **Windows**: `AppData/Local/<package_name>/` (qua `getApplicationDocumentsDirectory`).
 
@@ -23,7 +21,6 @@
 ## Cách hoạt động
 
 - Khi người dùng thêm ảnh hoặc file, ứng dụng sẽ sao chép file vào thư mục thích hợp của ứng dụng và lưu đường dẫn.
-- Bản vẽ tay lưu dưới dạng PNG vào thư mục `drawings`.
 - Khi xóa ghi chú, các file liên quan có thể được xóa thủ công bằng `StorageService.deleteNoteFiles`.
 
 ## Tham khảo

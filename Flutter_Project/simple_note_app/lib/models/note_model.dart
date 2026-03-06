@@ -12,9 +12,6 @@ class Note {
   /// Danh sách đường dẫn file đính kèm (lưu trữ locally)
   List<String> attachmentFiles;
 
-  /// Danh sách đường dẫn file vẽ tay (PNG format)
-  List<String> drawingFiles;
-
   Note({
     required this.id,
     required this.title,
@@ -23,7 +20,6 @@ class Note {
     required this.updatedAt,
     this.imageFiles = const [],
     this.attachmentFiles = const [],
-    this.drawingFiles = const [],
   });
 
   /// Tạo copy của Note với các thay đổi tùy ý
@@ -35,7 +31,6 @@ class Note {
     DateTime? updatedAt,
     List<String>? imageFiles,
     List<String>? attachmentFiles,
-    List<String>? drawingFiles,
   }) {
     return Note(
       id: id ?? this.id,
@@ -45,7 +40,6 @@ class Note {
       updatedAt: updatedAt ?? this.updatedAt,
       imageFiles: imageFiles ?? this.imageFiles,
       attachmentFiles: attachmentFiles ?? this.attachmentFiles,
-      drawingFiles: drawingFiles ?? this.drawingFiles,
     );
   }
 

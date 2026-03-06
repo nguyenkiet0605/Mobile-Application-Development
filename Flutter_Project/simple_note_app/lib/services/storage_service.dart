@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'dart:math';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
@@ -16,7 +15,6 @@ import 'package:permission_handler/permission_handler.dart';
 /// - notes/ (chứa data note)
 /// - images/ (chứa ảnh được chọn)
 /// - attachments/ (chứa file đính kèm)
-/// - drawings/ (chứa file vẽ tay)
 
 class StorageService {
   static final StorageService _instance = StorageService._internal();
@@ -60,16 +58,6 @@ class StorageService {
   Future<Directory> get attachmentsDir async {
     final appDir = await _appDir;
     final dir = Directory(path.join(appDir.path, 'notes', 'attachments'));
-    if (!await dir.exists()) {
-      await dir.create(recursive: true);
-    }
-    return dir;
-  }
-
-  /// Lấy thư mục lưu file vẽ tay
-  Future<Directory> get drawingsDir async {
-    final appDir = await _appDir;
-    final dir = Directory(path.join(appDir.path, 'notes', 'drawings'));
     if (!await dir.exists()) {
       await dir.create(recursive: true);
     }
@@ -130,22 +118,6 @@ class StorageService {
     }
   }
 
-  /// Lưu file vẽ tay (PNG bytes) vào thư mục drawings
-  /// Trả về: đường dẫn đầy đủ của file được lưu
-  Future<String> saveDrawing(Uint8List imageBytes) async {
-    try {
-      final drawingsDirectory = await drawingsDir;
-      final fileName = 'draw_${DateTime.now().millisecondsSinceEpoch}.png';
-      final destinationPath = path.join(drawingsDirectory.path, fileName);
-
-      final file = File(destinationPath);
-      await file.writeAsBytes(imageBytes);
-      return file.path;
-    } catch (e) {
-      throw Exception('Lỗi lưu file vẽ tay: $e');
-    }
-  }
-
   /// Xóa file theo đường dẫn
   Future<void> deleteFile(String filePath) async {
     try {
@@ -159,20 +131,16 @@ class StorageService {
   }
 
   /// Xóa tất cả file của một note
-  /// Gồm: ảnh, file đính kèm, file vẽ tay
+  /// Gồm: ảnh và file đính kèm
   Future<void> deleteNoteFiles(
     List<String> imageFiles,
     List<String> attachmentFiles,
-    List<String> drawingFiles,
   ) async {
     try {
       for (final filePath in imageFiles) {
         await deleteFile(filePath);
       }
       for (final filePath in attachmentFiles) {
-        await deleteFile(filePath);
-      }
-      for (final filePath in drawingFiles) {
         await deleteFile(filePath);
       }
     } catch (e) {
@@ -212,16 +180,6 @@ class StorageService {
       final attachments = await attachmentsDir;
       if (await attachments.exists()) {
         await for (final file in attachments.list(recursive: true)) {
-          if (file is File) {
-            totalSize += await file.length();
-          }
-        }
-      }
-
-      // Tính kích thước thư mục drawings
-      final drawings = await drawingsDir;
-      if (await drawings.exists()) {
-        await for (final file in drawings.list(recursive: true)) {
           if (file is File) {
             totalSize += await file.length();
           }

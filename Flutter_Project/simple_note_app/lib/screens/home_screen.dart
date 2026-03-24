@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/note_model.dart';
 import '../screens/add_note_screen.dart';
 import '../widgets/note_card.dart';
+import '../services/auth_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -11,6 +12,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final AuthService _auth = AuthService();
   // Danh sách ghi chú
   final List<Note> _notes = [];
 
@@ -120,6 +122,10 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.logout),
+          onPressed: () async => await _auth.signOut(),
+        ),
         title: const Text(
           '📝 My Notes',
           style: TextStyle(
